@@ -1,0 +1,31 @@
+[Unit]
+Description=Read Later (self-hosted read-later and bookmarks app)
+After=network.target
+
+[Service]
+Type=simple
+User=read-later
+Group=read-later
+WorkingDirectory=/opt/read-later
+EnvironmentFile=/etc/read-later/read-later.env
+ExecStart=/opt/read-later/.venv/bin/python -m readlater
+Restart=on-failure
+RestartSec=3
+UMask=0077
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+LockPersonality=true
+MemoryMax=768M
+CapabilityBoundingSet=
+ReadWritePaths=/var/lib/read-later
+
+[Install]
+WantedBy=multi-user.target

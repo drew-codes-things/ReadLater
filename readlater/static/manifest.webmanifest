@@ -1,0 +1,16 @@
+{
+  "name": "Read Later",
+  "short_name": "Read Later",
+  "description": "Save links, read them later without the clutter.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#19191c",
+  "theme_color": "#19191c",
+  "icons": [{ "src": "/static/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }],
+  "share_target": {
+    "action": "/save",
+    "method": "GET",
+    "params": { "title": "title", "text": "text", "url": "url" }
+  }
+}

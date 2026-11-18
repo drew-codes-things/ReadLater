@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#19191c">
+<meta name="referrer" content="no-referrer">
+<title>Read Later</title>
+<link rel="icon" href="/static/icon.svg" type="image/svg+xml">
+<link rel="manifest" href="/static/manifest.webmanifest" crossorigin="use-credentials">
+<link rel="stylesheet" href="/static/app.css">
+<script src="/static/app.js" defer></script>
+</head>
+<body data-pane="list">
+<header class="topbar">
+  <button class="icon-btn menu-btn" type="button" id="menu-btn" aria-label="Lists, collections and tags" title="Lists, collections and tags" aria-expanded="false">
+    <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+  </button>
+  <a class="brand" href="/" aria-label="Read Later home">
+    <img src="/static/icon.svg" alt="" width="28" height="28">
+    <span class="brand-name">Read <span class="brand-accent">Later</span></span>
+  </a>
+  <label class="search">
+    <span class="visually-hidden">Search saved links</span>
+    <input id="search" type="search" placeholder="Search saved links" maxlength="200" autocomplete="off">
+  </label>
+  <button class="btn send" type="button" id="save-btn" title="Save a link (n)">Save a link</button>
+</header>
+
+<div class="layout">
+  <nav class="sidebar" id="sidebar" aria-label="Lists">
+    <div class="views">
+      <button class="nav-btn" type="button" data-view="inbox"><span class="label">My list</span> <span class="count" id="count-inbox"></span></button>
+      <button class="nav-btn" type="button" data-view="favorites"><span class="label">Favourites</span> <span class="count" id="count-favorites"></span></button>
+      <button class="nav-btn" type="button" data-view="archive"><span class="label">Archive</span> <span class="count" id="count-archive"></span></button>
+      <button class="nav-btn" type="button" data-view="all"><span class="label">Everything</span> <span class="count" id="count-all"></span></button>
+      <button class="nav-btn" type="button" data-view="broken"><span class="label">Broken links</span> <span class="count" id="count-broken"></span></button>
+    </div>
+    <div class="tree">
+      <div class="tree-head">
+        <h2 class="tree-title">Collections</h2>
+        <button class="icon-btn small" type="button" id="new-collection-btn" aria-label="New collection" title="New collection">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+        </button>
+      </div>
+      <div class="nav-list" id="collection-list"></div>
+    </div>
+    <div class="tree">
+      <h2 class="tree-title">Tags</h2>
+      <div class="tag-cloud" id="tag-list"></div>
+    </div>
+    <div class="sidebar-tools">
+      <button class="btn ghost" type="button" id="check-all-btn">Check links</button>
+      <button class="btn ghost" type="button" id="import-btn">Import</button>
+      <a class="btn ghost" href="/api/export?format=json" download>Export JSON</a>
+      <a class="btn ghost" href="/api/export?format=html" download>Export bookmarks</a>
+      <button class="btn ghost" type="button" id="bookmarklet-btn">Bookmarklet</button>
+      <button class="btn ghost" type="button" id="keys-btn">Keyboard keys</button>
+      <input id="import-file" type="file" accept=".json,.html,.htm,application/json,text/html" hidden>
+    </div>
+  </nav>
+
+  <section class="list-pane" aria-label="Saved links">
+    <div class="list-head">
+      <div class="list-title-wrap">
+        <h1 class="list-title" id="list-title">My list</h1>
+        <button class="icon-btn" type="button" id="scope-settings" aria-label="Collection settings" title="Collection settings" hidden>
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16zM14 6l4 4"/></svg>
+        </button>
+      </div>
+      <span class="list-count" id="list-count"></span>
+    </div>
+    <div id="check-progress" class="notice" hidden></div>
+    <ol class="item-list" id="item-list"></ol>
+    <p class="empty-state" id="empty-state" hidden></p>
+    <button class="btn ghost more-btn" type="button" id="more-btn" hidden>Load more</button>
+  </section>
+
+  <article class="reader-pane" id="reader" aria-label="Article">
+    <div class="reader-empty" id="reader-empty">
+      <p>Pick a saved link to read it here.</p>
+      <p class="hint">j and k move between links, f favourites, a archives, h highlights the selected text.</p>
+    </div>
+    <div class="reader-body" id="reader-body" hidden>
+      <div class="reader-tools">
+        <button class="btn ghost back-btn" type="button" id="back-btn">Back</button>
+        <span class="spacer"></span>
+        <button class="icon-btn" type="button" id="favorite-btn" aria-pressed="false" aria-label="Favourite" title="Favourite (f)">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l2.8 5.7 6.2.9-4.5 4.4 1.1 6.2L12 17.3 6.4 20.2l1.1-6.2L3 9.6l6.2-.9z"/></svg>
+        </button>
+        <button class="icon-btn" type="button" id="archive-btn" aria-pressed="false" aria-label="Archive" title="Archive (a)">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 4h18v4H3zM5 8v12h14V8M10 12h4"/></svg>
+        </button>
+        <button class="icon-btn" type="button" id="highlight-btn" aria-label="Highlight the selected text" title="Highlight the selected text (h)">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 11l-6 6v3h9l3-3M22 12l-4.6 4.6a2 2 0 0 1-2.8 0l-5.2-5.2a2 2 0 0 1 0-2.8L14 4"/></svg>
+        </button>
+        <button class="icon-btn" type="button" id="check-btn" aria-label="Check the link" title="Check the link">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></svg>
+        </button>
+        <button class="icon-btn" type="button" id="delete-btn" aria-label="Delete" title="Delete">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg>
+        </button>
+        <a class="btn ghost" id="original-link" href="#" target="_blank" rel="noopener noreferrer">Open original</a>
+      </div>
+      <header class="reader-head">
+        <p class="reader-site" id="reader-site"></p>
+        <h2 class="reader-title" id="reader-title"></h2>
+        <p class="reader-meta" id="reader-meta"></p>
+      </header>
+      <div class="reader-fields">
+        <label class="field inline">
+          <span>Tags</span>
+          <input id="reader-tags" placeholder="comma, separated" maxlength="1100" autocomplete="off">
+        </label>
+        <label class="field inline">
+          <span>Collection</span>
+          <select id="reader-collection"></select>
+        </label>
+      </div>
+      <div class="notice error-notice" id="fetch-notice" hidden>
+        <span id="fetch-text"></span>
+        <button class="btn ghost" type="button" id="refetch-btn">Fetch again</button>
+      </div>
+      <div class="notice" id="images-notice" hidden>
+        <span id="images-text"></span>
+        <button class="btn ghost" type="button" id="load-images-btn">Load images</button>
+      </div>
+      <div class="article-content" id="article-content"></div>
+      <section class="reader-section" aria-labelledby="highlights-title">
+        <h3 class="section-title" id="highlights-title">Highlights</h3>
+        <p class="hint" id="highlights-empty">Select text in the article, then press h or the highlighter button.</p>
+        <ul class="highlight-list" id="highlight-list"></ul>
+      </section>
+      <section class="reader-section" aria-labelledby="note-title">
+        <h3 class="section-title" id="note-title">Note <span class="hint" id="note-state"></span></h3>
+        <textarea id="note" class="note" rows="4" maxlength="20000" placeholder="Your thoughts on this one"></textarea>
+      </section>
+    </div>
+  </article>
+</div>
+
+<dialog id="save-dialog" class="dialog" aria-labelledby="save-title">
+  <form id="save-form" method="dialog" autocomplete="off">
+    <h2 class="dialog-title" id="save-title">Save a link</h2>
+    <label class="field">
+      <span>Web address</span>
+      <input id="save-url" type="url" placeholder="https://example.com/article" maxlength="2048" required>
+    </label>
+    <label class="field">
+      <span>Tags</span>
+      <input id="save-tags" placeholder="comma, separated" maxlength="1100">
+    </label>
+    <label class="field">
+      <span>Collection</span>
+      <select id="save-collection"></select>
+    </label>
+    <p class="hint">Read Later fetches the page and keeps a clean copy of the article.</p>
+    <p class="form-error" id="save-error" hidden></p>
+    <div class="dialog-actions">
+      <button class="btn ghost" type="button" data-close>Cancel</button>
+      <button class="btn send" type="submit" id="save-submit">Save</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog id="collection-dialog" class="dialog" aria-labelledby="collection-dialog-title">
+  <form id="collection-form" method="dialog" autocomplete="off">
+    <h2 class="dialog-title" id="collection-dialog-title">New collection</h2>
+    <label class="field">
+      <span>Name</span>
+      <input id="collection-name" maxlength="100" required>
+    </label>
+    <p class="form-error" id="collection-error" hidden></p>
+    <div class="dialog-actions">
+      <button class="btn" type="button" id="collection-delete" hidden>Delete collection</button>
+      <span class="spacer"></span>
+      <button class="btn ghost" type="button" data-close>Cancel</button>
+      <button class="btn send" type="submit">Save</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog id="bookmarklet-dialog" class="dialog" aria-labelledby="bookmarklet-title">
+  <h2 class="dialog-title" id="bookmarklet-title">Save from any page</h2>
+  <p>Drag this button to your bookmarks bar. On any page, click it to save that page here.</p>
+  <p class="bookmarklet-row"><a class="btn send" id="bookmarklet-link" href="#">Save to Read Later</a></p>
+  <p class="hint">On a phone, share a page to Read Later after adding it to your home screen, or open this address with the page's link after it:</p>
+  <p class="hint code" id="share-address"></p>
+  <div class="dialog-actions">
+    <button class="btn send" type="button" data-close>Close</button>
+  </div>
+</dialog>
+
+<dialog id="keys-dialog" class="dialog" aria-labelledby="keys-title">
+  <h2 class="dialog-title" id="keys-title">Keyboard keys</h2>
+  <dl class="keys">
+    <dt><kbd>j</kbd></dt><dd>Next link</dd>
+    <dt><kbd>k</kbd></dt><dd>Previous link</dd>
+    <dt><kbd>f</kbd></dt><dd>Favourite or not</dd>
+    <dt><kbd>a</kbd></dt><dd>Archive or move back to My list</dd>
+    <dt><kbd>h</kbd></dt><dd>Highlight the selected text</dd>
+    <dt><kbd>v</kbd></dt><dd>Open the original in a new tab</dd>
+    <dt><kbd>n</kbd></dt><dd>Save a link</dd>
+    <dt><kbd>/</kbd></dt><dd>Search</dd>
+    <dt><kbd>Esc</kbd></dt><dd>Back to the list</dd>
+    <dt><kbd>?</kbd></dt><dd>This list</dd>
+  </dl>
+  <div class="dialog-actions">
+    <button class="btn send" type="button" data-close>Close</button>
+  </div>
+</dialog>
+
+<div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+</body>
+</html>

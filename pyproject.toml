@@ -1,0 +1,24 @@
+[project]
+name = "read-later"
+dynamic = ["version"]
+description = "Self-hosted read-later and bookmarks app, your own free take on Pocket and Raindrop"
+requires-python = ">=3.11"
+license = "MIT"
+dependencies = ["flask==3.1.3", "waitress==3.0.2", "nh3==0.3.7", "lxml==6.1.3", "readability-lxml==0.9"]
+
+[project.optional-dependencies]
+dev = ["pytest==9.1.1", "pyflakes==4.1.0"]
+
+[tool.setuptools.dynamic]
+version = { attr = "readlater.__version__" }
+
+[tool.setuptools.packages.find]
+include = ["readlater*"]
+
+[tool.setuptools.package-data]
+readlater = ["static/*", "static/fonts/*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = [".", "tests"]
+filterwarnings = ["error::pytest.PytestUnraisableExceptionWarning"]
