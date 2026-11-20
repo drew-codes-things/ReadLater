@@ -34,8 +34,8 @@ ARCHIVE_HEADINGS = frozenset({"read archive", "archive", "archived"})
 NOTE_ENDING_TAGS = frozenset({"dt", "dl", "h1", "h2", "h3", "a", "li", "ul"})
 BOOKMARKS_HEADER = """<!DOCTYPE NETSCAPE-Bookmark-file-1>
 <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
-<TITLE>Read Later</TITLE>
-<H1>Read Later</H1>
+<TITLE>Starfire Read Later</TITLE>
+<H1>Starfire Read Later</H1>
 <DL><p>
 """
 BOOKMARKS_FOOTER = "</DL><p>\n"
@@ -173,7 +173,7 @@ def _import_list(library, records: list[dict], skipped_before: int) -> dict:
 
 def import_json(library, payload) -> dict:
     if not isinstance(payload, dict) or payload.get("app") != APP_NAME:
-        raise LibraryError("this is not a Read Later export")
+        raise LibraryError("this is not a Starfire Read Later export")
     if payload.get("version") != EXPORT_VERSION:
         raise LibraryError(f"this export is version {payload.get('version')!r}, only version {EXPORT_VERSION} can be read")
     items = payload.get("items")

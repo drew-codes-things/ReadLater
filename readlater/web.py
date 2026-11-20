@@ -17,7 +17,7 @@ from .signin import SIGN_IN_PATHS, PasswordAuth, add_sign_in_pages
 from .transfer import export_bookmarks_html, export_json, import_any
 
 STATIC_DIR = Path(__file__).resolve().parent / "static"
-APP_NAME = "Read Later"
+APP_NAME = "Starfire Read Later"
 MAX_REQUEST_BYTES = 10 * 1024 * 1024
 MAX_IMAGE_BYTES = 5 * 1024 * 1024
 CSRF_HEADER = "X-CSRF-Token"

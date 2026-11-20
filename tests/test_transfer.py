@@ -122,6 +122,17 @@ def test_bookmarks_html_export_is_netscape_format_and_escaped(library):
     assert "Manual &lt;script&gt;alert(&quot;x&quot;)&lt;/script&gt; &amp; more" in html
 
 
+def test_bookmarks_html_export_is_titled_starfire_read_later(library):
+    html = export_bookmarks_html(library)
+    assert "<TITLE>Starfire Read Later</TITLE>" in html
+    assert "<H1>Starfire Read Later</H1>" in html
+
+
+def test_an_import_from_another_app_is_refused_by_the_starfire_read_later_name(library):
+    with pytest.raises(LibraryError, match="this is not a Starfire Read Later export"):
+        import_json(library, {"app": "something-else"})
+
+
 def test_bookmarks_html_round_trip(library, other):
     fill(library)
     summary = import_bookmarks_html(other, export_bookmarks_html(library))

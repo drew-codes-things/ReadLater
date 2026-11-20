@@ -59,7 +59,10 @@ def test_user_header_from_outside_the_proxy_is_refused(client):
 def test_page_and_static_files_are_served_with_a_strict_policy(owner):
     page = owner.get("/")
     assert page.status_code == 200
-    assert b"Read Later" in page.data
+    assert b"<title>Starfire Read Later</title>" in page.data
+    assert b'aria-label="Starfire Read Later home"' in page.data
+    assert b'Starfire <span class="brand-accent">Read Later</span>' in page.data
+    assert b"Save to Starfire Read Later" in page.data
     policy = page.headers["Content-Security-Policy"]
     assert "script-src 'self'" in policy and "img-src 'self' data:" in policy and "frame-src 'none'" in policy
     assert "frame-ancestors 'none'" in policy
@@ -69,6 +72,12 @@ def test_page_and_static_files_are_served_with_a_strict_policy(owner):
     for name in ("app.js", "app.css", "icon.svg", "manifest.webmanifest", "fonts/ibm-plex-sans-latin-400-normal.woff2"):
         assert owner.get(f"/static/{name}").status_code == 200, name
     assert owner.get("/static/../web.py").status_code == 404
+
+
+def test_the_manifest_is_named_starfire_read_later(owner):
+    manifest = json.loads(owner.get("/static/manifest.webmanifest").data)
+    assert manifest["name"] == "Starfire Read Later"
+    assert manifest["short_name"] == "Starfire Read Later"
 
 
 def test_the_manifest_offers_a_share_target_that_opens_the_save_page(owner):

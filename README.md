@@ -1,6 +1,6 @@
 <div align="center">
 
-# Read Later
+# Starfire Read Later
 
 **Your own free take on Pocket and Raindrop. Save links from anywhere, read a clean copy without the clutter or the trackers, highlight, tag and search it all, kept in one SQLite file on your own server.**
 
@@ -11,17 +11,17 @@
 
 </div>
 
-![Read Later with collections, tags, a reading list and an article with a highlight](screenshot.png)
+![Starfire Read Later with collections, tags, a reading list and an article with a highlight](screenshot.png)
 
 ---
 
 ## Overview
 
-Read Later is a small self-hosted read-later and bookmarks app. It has its
+Starfire Read Later is a small self-hosted read-later and bookmarks app. It has its
 own sign-in for one owner account, so a copy runs on its own. It can also
 sit behind a sign-in proxy: the author runs it behind the starfire sign-in
 like Keep Notes and Tasks, where Caddy checks the sign-in, then passes the
-request to Read Later on `127.0.0.1`.
+request to Starfire Read Later on `127.0.0.1`.
 
 - **Save a link** three ways: paste it into Save a link, use the
   **bookmarklet** on any page, or open `/save?url=...` (which is also the
@@ -33,7 +33,7 @@ request to Read Later on `127.0.0.1`.
 - **Nothing tracks you while you read.** Article HTML is cleaned with an
   allowlist (no scripts, frames, forms, styles, event handlers or
   `javascript:` links). **Images are held back by default**; "Load images"
-  for one article fetches them through Read Later, so the site never sees
+  for one article fetches them through Starfire Read Later, so the site never sees
   your browser, cookies or address.
 - **My list, Favourites, Archive, Everything** and **Broken links**,
   **collections** (one per link) and **tags** (many per link).
@@ -93,7 +93,7 @@ machine: it then refuses to listen on anything but `127.0.0.1`, `::1` or
 
 ## First run and sign-in
 
-Read Later has its own sign-in, switched on by default (`AUTH_MODE=builtin`).
+Starfire Read Later has its own sign-in, switched on by default (`AUTH_MODE=builtin`).
 There is one owner account and no sign-up page.
 
 1. Start it (`.venv/bin/python -m readlater`) and open
@@ -172,16 +172,16 @@ from those addresses; in the default mode it is never read.
 ## Saving links
 
 **Save a link** (or `n`): paste the address, add tags and a collection if
-you like. Read Later fetches the page there and then. If the page cannot be
+you like. Starfire Read Later fetches the page there and then. If the page cannot be
 fetched, or is a PDF or another file, the link is still kept, with the
 reason, and a **Fetch again** button in the reader.
 
 **Bookmarklet**: open Bookmarklet in the sidebar and drag the button to your
-bookmarks bar. Clicking it on any page opens a small Read Later window with
+bookmarks bar. Clicking it on any page opens a small Starfire Read Later window with
 that page's address filled in; press Enter or Save.
 
-**From a phone**: add Read Later to the home screen from the browser menu,
-then use Share on any page and pick Read Later. Any app can also open
+**From a phone**: add Starfire Read Later to the home screen from the browser menu,
+then use Share on any page and pick Starfire Read Later. Any app can also open
 `https://read.example.com/save?url=<address>`. If the shared text only has
 the link inside it (some Android apps do this), the first `http` or `https`
 address in it is used.
@@ -212,7 +212,7 @@ is not carried through it; share again after signing in.
   `/api/auth/users` (the admin account only), then sets
   `X-Forwarded-User` itself, to `SIGNED_IN_USER` from `deploy/site.env`.
   `ALLOWED_USERS` in the server env file is set to the same name and makes
-  Read Later refuse anything else.
+  Starfire Read Later refuse anything else.
 - Every write needs the `X-CSRF-Token` header from `/api/session`, and a
   write whose `Origin` is another host is refused.
 - Pages ship a strict Content Security Policy: scripts, styles, fonts and
@@ -248,7 +248,7 @@ one guard:
 A link to a private address is refused and **not saved**; there is nothing
 to read there from the server anyway.
 
-The image proxy (`/img`) only fetches addresses that Read Later itself
+The image proxy (`/img`) only fetches addresses that Starfire Read Later itself
 signed with the secret key while cleaning an article, and only passes PNG,
 JPEG, GIF, WebP and AVIF back (never SVG, which can carry scripts).
 
@@ -258,7 +258,7 @@ JPEG, GIF, WebP and AVIF back (never SVG, which can carry scripts).
 
 **Export JSON** keeps everything: addresses, titles, the saved article
 text, tags, collections, favourites, archive, progress, notes and
-highlights. Importing it into an empty Read Later gives the same library
+highlights. Importing it into an empty Starfire Read Later gives the same library
 back.
 
 **Export bookmarks** writes a Netscape bookmarks file (what browsers,
@@ -317,11 +317,11 @@ systemctl start read-later
 > **UNTESTED.** `deploy.sh` and this section were written without touching
 > the live server. Read the script before running it.
 
-On that server Read Later trusts the gate instead of its own sign-in:
+On that server Starfire Read Later trusts the gate instead of its own sign-in:
 `deploy/read-later.env` sets `AUTH_MODE=proxy` and
 `TRUSTED_PROXIES=127.0.0.1,::1`.
 
-`deploy.sh` installs Read Later into a Proxmox container that already runs
+`deploy.sh` installs Starfire Read Later into a Proxmox container that already runs
 Caddy and the starfire sign-in, reached with `ssh` and `pct`. The values for
 your own setup live in `deploy/site.env`, which git ignores. Copy
 `deploy/site.env.example` and fill it in:
@@ -330,7 +330,7 @@ your own setup live in `deploy/site.env`, which git ignores. Copy
 |---|---|
 | `PROXMOX` | The ssh host name of the Proxmox machine. |
 | `CT` | The number of the container that runs Caddy. |
-| `SITE_HOST` | The host name Read Later is served on, like `read.example.com`. |
+| `SITE_HOST` | The host name Starfire Read Later is served on, like `read.example.com`. |
 | `SIGNED_IN_USER` | The starfire admin account name; Caddy passes it on and it becomes `ALLOWED_USERS`. |
 
 What it sets up, matching Keep Notes and Tasks:
@@ -361,7 +361,7 @@ it, so moving the app to another port means changing that one line and running
 The Caddyfile is checked with `caddy validate` before every reload and put back
 if it does not validate, and the sha256 of every deployed file is compared with
 the commit. If `systemctl reload caddy` fails, the Caddyfile is put back too,
-so a block Caddy never loaded is never left on disk. With Read Later already
+so a block Caddy never loaded is never left on disk. With Starfire Read Later already
 running, a `PORT` that another program listens on is refused as well (the
 listener's process must be the read-later service's own). `check` also fails when
 the marked block sends to another port than `PORT`. Each `apply` and `undo`

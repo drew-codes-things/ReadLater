@@ -1,6 +1,6 @@
 {
-  "name": "Read Later",
-  "short_name": "Read Later",
+  "name": "Starfire Read Later",
+  "short_name": "Starfire Read Later",
   "description": "Save links, read them later without the clutter.",
   "start_url": "/",
   "scope": "/",
